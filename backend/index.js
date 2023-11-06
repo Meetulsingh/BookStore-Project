@@ -1,0 +1,42 @@
+import express from "express";
+import { PORT, mongoDBURL } from "./config.js";
+import mongoose from 'mongoose';
+import { Book } from './models/bookModels.js';
+import booksRoute from './routes/booksRoute.js';
+import cors from 'cors';
+
+const app = express();
+
+// Middleware for parsing req body
+app.use(express.json()); 
+
+//Middleware to handle cors policy
+//option1 : allow all origins with default of cors(*)
+app.use(cors());
+
+//option2: Allow custom objects
+// app.use(
+//     cors({
+//         origin: 'http://localhost:300',
+//         methods: ['GET','POST','PUT','DELETE'],
+//         allowedHeaders:['Content-Type']
+//     })
+// );
+
+app.get('/', (request, response) => {
+    console.log(request);
+    return response.status(234).send('Welcome to MERN stack');
+});
+
+app.use('/books',booksRoute);
+
+mongoose.connect(mongoDBURL)
+    .then(() => {
+        console.log('App connected to the database');
+        app.listen(PORT, () => {
+            console.log(`App is listening to: ${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error(error);
+    });
